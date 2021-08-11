@@ -1,8 +1,8 @@
-# Numina » Take-Home Project for Backend Software Engineer Candidates
+# KafkaSensors
 
-### Hello Numina Team!
+### Introduction
 
-I spent a while initially just going over the project instructions, deliverables, and given code base. While I'm familiar with producer/consumer architecture, I've never used Kafka in a project before, so I read through some of the Kafka docs and python examples to begin with. I then ran the given system to make sure I had docker running and got a sense for the scale & rate of the sensor output.
+After deciding to expirement with live sensor streaming for myself, I spent a while initially just looking into other projects & systems for inspiration. While I'm familiar with producer/consumer architecture, I've never used Kafka in a project before, so I read through some of the Kafka docs and python examples to begin with. I then ran the given system to make sure I had docker running and got a sense for the scale & rate of the sensor output.
 
 Since this was a multi-component process, I knew I'd want to begin with a system design, before deciding on & designing a metrics database, and then develop iteratively through git.
 
