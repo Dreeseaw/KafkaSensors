@@ -1,0 +1,69 @@
+---
+version: '2'
+services:
+  redis:
+    image: redis:alpine
+    hostname: redis
+    ports:
+      - '6379:6379'
+
+  # based off https://levelup.gitconnected.com/creating-and-filling-a-postgres-db-with-docker-compose-e1607f6f882f
+  postgres:
+    image: postgres:latest
+    hostname: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=numina
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - '5438:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      # copy the sql script to create tables
+      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    ports:
+      - '32181:32181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  simulator:
+    build: ./simulator
+    hostname: simulator
+
+  consumer:
+    build: ./consumer
+    hostname: consumer
+    restart: always
+    scale: 2
+
+  apinode:
+    build: ./apinode
+    hostname: apinode
+    restart: always
+    ports:
+      - 5000:5000
